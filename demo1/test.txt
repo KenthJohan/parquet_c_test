@@ -1,0 +1,161 @@
+{
+  "Version": 1,
+  "Num_rows": 1000,
+  "Created_by": "parquet-mr version 1.8.1 (build 4aba4dae7bb0d4edbcf7923ae1339f28fd3f7fcf)",
+  "Schema": [
+    {
+      "Field_id": 0,
+      "Name": "hive_schema",
+      "Type": "BOOLEAN",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "REQUIRED",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "registration_dttm",
+      "Type": "INT96",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "id",
+      "Type": "INT32",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "first_name",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "last_name",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "email",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "gender",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "ip_address",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "cc",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "country",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "birthdate",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "salary",
+      "Type": "DOUBLE",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "title",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    },
+    {
+      "Field_id": 0,
+      "Name": "comments",
+      "Type": "BYTE_ARRAY",
+      "Type_length": 0,
+      "LogicalType": null,
+      "Scale": 0,
+      "Precision": 0,
+      "Repetition_type": "OPTIONAL",
+      "Converted_type": "UTF8"
+    }
+  ]
+}

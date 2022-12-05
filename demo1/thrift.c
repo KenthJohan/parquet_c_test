@@ -82,7 +82,7 @@ uint8_t * thrift_read_footer(FILE * file, int32_t * out_length)
 }
 
 
-char * thrift_get_type_string(uint32_t t)
+char const * thrift_get_type_string(uint32_t t)
 {
 	switch(t)
 	{
@@ -138,9 +138,9 @@ void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
 
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type)
 {
-	union thrift_value value;
+    union thrift_value value = {0};
 	switch (type)
-	{
+    {
 	case THRIFT_STOP:break;
 	case THRIFT_STRUCT:
 		ctx->last_field_id = 0;

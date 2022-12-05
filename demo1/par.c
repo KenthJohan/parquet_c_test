@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <flecs.h>
 
-char * par_get_id_string(uint32_t id)
+char const * par_get_id_string(uint32_t id)
 {
 	switch(id)
 	{
@@ -16,7 +16,7 @@ char * par_get_id_string(uint32_t id)
 }
 
 
-char * par_get_type_string(uint32_t t)
+char const * par_get_type_string(uint32_t t)
 {
 	switch(t)
 	{
@@ -31,8 +31,6 @@ char * par_get_type_string(uint32_t t)
 	default: return "";
 	}
 }
-
-
 
 void par_print_field(int32_t id, int32_t type, union thrift_value value)
 {

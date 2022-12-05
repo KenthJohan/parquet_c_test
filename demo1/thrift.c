@@ -56,32 +56,6 @@ int64_t thrift_read_zigzag_i64(struct thrift_context * ctx)
 
 
 
-
-
-
-
-
-
-
-uint8_t * thrift_read_footer(FILE * file, int32_t * out_length)
-{
-	char par1[4] = {0};
-	char par2[4] = {0};
-	int32_t l = 0;
-	fseek(file, 0, SEEK_SET);
-	fread(par1, sizeof(par1), 1, file);
-	fseek(file, -8, SEEK_END);
-	fread(&l, sizeof(int32_t), 1, file);
-	fseek(file, 0, SEEK_SET);
-	fread(par2, sizeof(par2), 1, file);
-	fseek(file, -8-l, SEEK_END);
-	uint8_t * footer = ecs_os_malloc(l);
-	fread(footer, l, 1, file);
-	(*out_length) = l;
-	return footer;
-}
-
-
 char const * thrift_get_type_string(uint32_t t)
 {
 	switch(t)

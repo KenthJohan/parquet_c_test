@@ -3,9 +3,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <flecs.h>
-#include "thrift.h"
-#include "par.h"
-#include "misc.h"
+#include "parquet.h"
 
 
 
@@ -18,7 +16,7 @@
 int main (int argc, char * argv [])
 {
 	ecs_world_t *world = ecs_init();
-	par_read();
+    parquet_testcase1();
 
 	//long l;
 	//uint8_t * f = file_malloc("../demo1/userdata1.parquet", &l);

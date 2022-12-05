@@ -5,12 +5,12 @@ CONFIG -= qt
 DEFINES += __USE_MINGW_ANSI_STDIO=1
 
 
-HEADERS += par.h
+HEADERS += parquet.h
 HEADERS += thrift.h
 HEADERS += misc.h
 
 SOURCES += flecs.c
-SOURCES += par.c
+SOURCES += parquet.c
 SOURCES += thrift.c
 SOURCES += misc.c
 SOURCES += main.c

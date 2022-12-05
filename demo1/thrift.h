@@ -54,7 +54,7 @@ struct thrift_context
 };
 
 
-uint8_t * thrift_read_footer(FILE * file, int32_t * out_length);
+
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type);
 char const * thrift_get_type_string(uint32_t t);
 void thrift_get_field_str(int32_t type, union thrift_value value, char * buf);

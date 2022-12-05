@@ -1,7 +1,7 @@
 #pragma once
 #include "thrift.h"
 #include <stdint.h>
-#include <flecs.h>
+#include "flecs.h"
 
 // https://github.com/apache/thrift/blob/master/lib/cpp/src/thrift/protocol/TCompactProtocol.tcc
 
@@ -119,7 +119,7 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 	case THRIFT_STRUCT:
 		ctx->last_field_id = 0;
 		ctx->push(ctx, 0, type, value);
-		while(1)
+        while(1)
 		{
 			uint8_t modifier;
 			int32_t id;

@@ -3,7 +3,7 @@
 #include "thrift.h"
 #include <stdlib.h>
 #include <stdint.h>
-#include <flecs.h>
+#include "flecs.h"
 
 char const * parquet_get_id_string(uint32_t id)
 {

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
-#include <flecs.h>
+#include "flecs.h"
 #include "parquet.h"
 
 

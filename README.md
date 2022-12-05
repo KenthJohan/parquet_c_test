@@ -1,3 +1,7 @@
+# Parquete
+https://parquet.apache.org/docs/file-format/metadata/
+
+# Thrift
 message               => protocol-id version-and-type seq-id method-name struct-encoding 
 protocol-id           => 0x82
 version-and-type      => (5-bit version identifier) (3-bit type identifier)

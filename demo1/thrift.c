@@ -17,8 +17,8 @@ int64_t thrift_read_varint_i64(struct thrift_context * ctx)
 	int shift = 0;
 	while (1)
 	{
-		uint8_t b = ctx->current[0];
-		ctx->current++;
+		uint8_t b = ctx->data_current[0];
+		ctx->data_current++;
 		rsize ++;
 		if (shift <= 25)
 		{
@@ -111,6 +111,7 @@ void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
 
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type)
 {
+	if(ctx->data_current >= ctx->data_end){goto no_more_data;}
     union thrift_value value = {0};
 	uint8_t byte;
 	switch (type)
@@ -123,11 +124,12 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		{
 			uint8_t modifier;
 			int32_t id;
-			byte = ctx->current[0];
-			ctx->current++;
+			byte = ctx->data_current[0];
+			ctx->data_current++;
 			modifier = (byte & 0xF0) >> 4;
 			type = byte & 0x0F;
 			if(type == THRIFT_STOP){break;}
+			if(ctx->data_current >= ctx->data_end){goto no_more_data;}
 			if (modifier == 0)
 			{
 				id = thrift_read_varint_i64(ctx);
@@ -142,9 +144,15 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		break;
 	case THRIFT_BINARY:
 		value.string_size = thrift_read_varint_i64(ctx);
-		value.string_data = ecs_os_malloc(value.string_size);
-		memcpy(value.string_data, ctx->current, value.string_size);
-		ctx->current += value.string_size;
+		value.string_data = NULL;
+		if(value.string_size < 0){printf("error1!\n");goto error;}
+		if(value.string_size > 10000){printf("error3!\n");goto error;}
+		if(value.string_size > 0)
+		{
+			value.string_data = ecs_os_malloc(value.string_size);
+			memcpy(value.string_data, ctx->data_current, value.string_size);
+			ctx->data_current += value.string_size;
+		}
 		ctx->push(ctx, id, type, value);
 		break;
 	case THRIFT_BOOLEAN_TRUE:
@@ -164,10 +172,11 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		ctx->push(ctx, id, type, value);
 		break;
 	case THRIFT_LIST:
-		byte = ctx->current[0];
+		byte = ctx->data_current[0];
 		value.list_type = byte & 0x0F;
 		value.list_size = (byte >> 4) & 0x0F;
-		ctx->current++;
+		ctx->data_current++;
+		if(ctx->data_current >= ctx->data_end){goto no_more_data;}
 		if(value.list_size == 0xF)
 		{
 			value.list_size = thrift_read_varint_i64(ctx);
@@ -182,6 +191,12 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		printf("Warning no type found %i!\n", type);
 		break;
 	}
+	return;
+no_more_data:
+	printf("No more data is available!\n");
+	return;
+error:
+	return;
 }
 
 

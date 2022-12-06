@@ -59,16 +59,18 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
     fseek(file, 0, SEEK_SET);
     fread(par2, sizeof(par2), 1, file);
     fseek(file, -8-l, SEEK_END);
-    ctx->data = ecs_os_malloc(l);
-    ctx->current = ctx->data;
-    fread(ctx->data, l, 1, file);
-    ctx->length = l;
+    ctx->data_start = ecs_os_malloc(l);
+    ctx->data_current = ctx->data_start;
+    ctx->data_end = ctx->data_start + l;
+
+    fread(ctx->data_start, l, 1, file);
 }
 
 
 void push(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value)
 {
     parquet_print_field(id, type, value);
+	//printf("%p %p\n", ctx->data_current, ctx->data_end);
 }
 
 void parquet_testcase1()
@@ -88,7 +90,7 @@ void parquet_testcase1()
 
 
 	if(file) {fclose(file);}
-	if(ctx.data) {ecs_os_free(ctx.data);}
+	if(ctx.data_start) {ecs_os_free(ctx.data_start);}
 }
 
 

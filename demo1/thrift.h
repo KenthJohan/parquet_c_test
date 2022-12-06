@@ -46,9 +46,10 @@ union thrift_value
 
 struct thrift_context
 {
-	uint8_t * data;
-	uint8_t * current;
-	int32_t length;
+	uint8_t * data_start;
+	uint8_t * data_end;
+	uint8_t * data_current;
+
 	int32_t last_field_id;
     void (*push)(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value);
 };

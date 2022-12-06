@@ -1,4 +1,3 @@
-#pragma once
 #include "misc.h"
 #include "flecs.h"
 #include <stdio.h>

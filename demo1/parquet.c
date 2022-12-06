@@ -1,4 +1,3 @@
-#pragma once
 #include "parquet.h"
 #include "thrift.h"
 #include <stdlib.h>

@@ -1,4 +1,3 @@
-#pragma once
 #include "thrift.h"
 #include <stdint.h>
 #include "flecs.h"

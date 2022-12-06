@@ -2,34 +2,17 @@
     "tasks": [
       {
         "type": "shell",
-        "label": "g++.exe build active file",
-        "command": "C:/msys64/mingw64/bin/gcc.exe",
-        "args": [
-          "-g",
-          "${workspaceFolder}/*.c",
-          "-o",
-          "${fileDirname}/${fileBasenameNoExtension}.exe",
-          "-lws2_32"
-        ],
+        "label": "mingw64 build",
+        "command": "C:/msys64/mingw64/bin/mingw32-make.exe",
+        "args": [],
         "options": {
-          "cwd": "C:/msys64/mingw64/bin"
-        }
-      },
-      {
-        "type": "shell",
-        "label": "g++ build & run active file",
-        "command": "C:/msys64/mingw64/bin/gcc.exe",
-        "args": [
-            "${workspaceFolder}/*.c",
-          "-o",
-          "${fileDirname}/${fileBasenameNoExtension}.exe",
-          "-lws2_32"
-        ],
-        "options": {
-          "cwd": "C:/msys64/mingw64/bin"
+          "cwd": "${workspaceFolder}",
+          "shell": {
+            "executable": "C:/msys64/msys2_shell.cmd",
+            "args": ["-defterm", "-mingw64", "-no-start", "-here", "-shell bash -c"]
+          }
         }
       }
-    ],
-    "version":"2.0.0"
-  }
+    ]
+}
   

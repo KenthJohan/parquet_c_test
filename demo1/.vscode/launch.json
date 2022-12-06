@@ -1,11 +1,10 @@
 {
-    "version": "0.2.0",
     "configurations": [
       {
-        "name": "g++.exe build and debug active file",
+        "name": "mingw64 build and debug",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+        "program": "${workspaceFolder}/build/demo1.exe",
         "args": [],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
@@ -20,28 +19,7 @@
             "ignoreFailures": true
           }
         ],
-        "preLaunchTask": "g++.exe build active file"
-      },
-      {
-        "name": "g++ build & run active file",
-        "type": "cppdbg",
-        "request": "launch",
-        "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
-        "args": [],
-        "stopAtEntry": false,
-        "cwd": "${workspaceFolder}",
-        "environment": [],
-        "externalConsole": false, //set to true to see output in cmd instead
-        "MIMode": "gdb",
-        "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe",
-        "setupCommands": [
-          {
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-          }
-        ],
-        "preLaunchTask": "g++ build & run active file"
+        "preLaunchTask": "mingw64 build"
       }
       ]
   }

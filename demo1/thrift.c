@@ -113,6 +113,7 @@ void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type)
 {
     union thrift_value value = {0};
+	uint8_t byte;
 	switch (type)
     {
 	case THRIFT_STOP:break;
@@ -123,9 +124,10 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		{
 			uint8_t modifier;
 			int32_t id;
-			modifier = (ctx->current[0] & 0xF0) >> 4;
-			type = ctx->current[0] & 0x0F;
+			byte = ctx->current[0];
 			ctx->current++;
+			modifier = (byte & 0xF0) >> 4;
+			type = byte & 0x0F;
 			if(type == THRIFT_STOP){break;}
 			if (modifier == 0)
 			{
@@ -163,8 +165,9 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		ctx->push(ctx, id, type, value);
 		break;
 	case THRIFT_LIST:
-		value.list_type = ctx->current[0] & 0x0F;
-		value.list_size = (ctx->current[0] >> 4) & 0x0F;
+		byte = ctx->current[0];
+		value.list_type = byte & 0x0F;
+		value.list_size = (byte >> 4) & 0x0F;
 		ctx->current++;
 		if(value.list_size == 0xF)
 		{

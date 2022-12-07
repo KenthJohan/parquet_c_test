@@ -1,11 +1,14 @@
 # https://makefiletutorial.com/
 
-TARGET_EXEC := demo1.exe
+TARGET_EXEC := demo1
 BUILD_DIR := ./build
 SRC_DIRS := ./
 
-CXX := C:/msys64/mingw64/bin/gcc.exe
-LDFLAGS := -lws2_32
+
+ifeq ($(OS),Windows_NT)
+	CXX := C:/msys64/mingw64/bin/gcc.exe
+    LDFLAGS := -lws2_32
+endif
 
 SRCS := $(shell find $(SRC_DIRS) -name "*.c")
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

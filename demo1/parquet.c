@@ -31,17 +31,6 @@ char const * parquet_get_type_string(uint32_t t)
 	}
 }
 
-static int indent = 0;
-void parquet_print_field(int32_t id, int32_t type, union thrift_value value)
-{
-	char buf[100] = {0};
-	thrift_get_field_str(type, value, buf);
-	for(int i = 0; i < indent; ++i){printf("|");}
-	printf("%02i = %-20s : %s\n", id, buf, thrift_get_type_string(type));
-	indent += (type == THRIFT_STRUCT);
-	indent -= (type == THRIFT_STOP);
-}
-
 
 void parquet_read_footer(struct thrift_context * ctx, FILE * file)
 {
@@ -58,39 +47,6 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
     ctx->data_start = ecs_os_malloc(l);
     ctx->data_current = ctx->data_start;
     ctx->data_end = ctx->data_start + l;
-
     fread(ctx->data_start, l, 1, file);
 }
-
-
-void push(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value)
-{
-    parquet_print_field(id, type, value);
-	//printf("%p %p\n", ctx->data_current, ctx->data_end);
-}
-
-void parquet_testcase1()
-{
-	FILE * file = NULL;
-	ecs_os_fopen(&file, "../demo1/userdata1.parquet", "rb");
-	int32_t l = 0;
-	struct thrift_context ctx = {0};
-    ctx.push = push;
-    parquet_read_footer(&ctx, file);
-	thrift_recursive_read(&ctx, 0, THRIFT_STRUCT);
-
-	for(int32_t i = 0; i < l; ++i)
-	{
-		//printf("%2c : %02X\n", ctx.data[i], ctx.data[i]);
-	}
-
-
-	if(file) {fclose(file);}
-	if(ctx.data_start) {ecs_os_free(ctx.data_start);}
-}
-
-
-
-
-
 

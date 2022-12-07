@@ -42,7 +42,7 @@ int64_t thrift_read_varint_i64(struct thrift_context * ctx)
 		}
 	}
 	//return new Int64(hi, lo);
-	return lo;
+	return (hi << 32) | (lo << 0);
 }
 
 int64_t thrift_read_zigzag_i64(struct thrift_context * ctx)
@@ -119,7 +119,7 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 	case THRIFT_STOP:break;
 	case THRIFT_STRUCT:
 		ctx->last_field_id = 0;
-		ctx->push(ctx, 0, type, value);
+		ctx->cb_field(ctx, 0, type, value);
         while(1)
 		{
 			uint8_t modifier;
@@ -130,7 +130,7 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			type = byte & 0x0F;
 			if(type == THRIFT_STOP)
 			{
-				ctx->push(ctx, 0, type, value);
+				ctx->cb_field(ctx, 0, type, value);
 				break;
 			}
 			if(ctx->data_current >= ctx->data_end){goto no_more_data;}
@@ -157,23 +157,23 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			memcpy(value.string_data, ctx->data_current, value.string_size);
 			ctx->data_current += value.string_size;
 		}
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_BOOLEAN_TRUE:
 		value.value_u64 = 1;
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_BOOLEAN_FALSE:
 		value.value_u64 = 1;
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_I32:
 		value.value_i64 = thrift_read_zigzag_i64(ctx);
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_I64:
 		value.value_i64 = thrift_read_zigzag_i64(ctx);
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_LIST:
 		byte = ctx->data_current[0];
@@ -185,7 +185,7 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		{
 			value.list_size = thrift_read_varint_i64(ctx);
 		}
-		ctx->push(ctx, id, type, value);
+		ctx->cb_field(ctx, id, type, value);
 		for(int i = 0; i < value.list_size; ++i)
 		{
 			thrift_recursive_read(ctx, id, value.list_type);

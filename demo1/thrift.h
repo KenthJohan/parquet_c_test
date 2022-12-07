@@ -16,17 +16,6 @@
 #define THRIFT_MAP 0x0B
 #define THRIFT_STRUCT 0x0C
 
-/*
-  BOOLEAN = 0;
-  INT32 = 1;
-  INT64 = 2;
-  INT96 = 3;
-  FLOAT = 4;
-  DOUBLE = 5;
-  BYTE_ARRAY = 6;
-  FIXED_LEN_BYTE_ARRAY = 7;
-  */
-
 union thrift_value
 {
 	uint64_t value_u64;
@@ -49,13 +38,12 @@ struct thrift_context
 	uint8_t * data_start;
 	uint8_t * data_end;
 	uint8_t * data_current;
-
 	int32_t last_field_id;
-    void (*push)(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value);
+    void (*cb_field)(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value);
 };
 
 
 
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type);
-char const * thrift_get_type_string(uint32_t t);
 void thrift_get_field_str(int32_t type, union thrift_value value, char * buf);
+char const * thrift_get_type_string(uint32_t t);

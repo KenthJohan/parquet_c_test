@@ -59,19 +59,19 @@ char const * thrift_get_type_string(uint32_t t)
 {
 	switch(t)
 	{
-	case THRIFT_STOP: return "THRIFT_STOP";
-	case THRIFT_BOOLEAN_TRUE: return "THRIFT_BOOLEAN_TRUE";
-	case THRIFT_BOOLEAN_FALSE: return "THRIFT_BOOLEAN_FALSE";
-	case THRIFT_BYTE: return "THRIFT_BYTE";
-	case THRIFT_I16: return "THRIFT_I16";
-	case THRIFT_I32: return "THRIFT_I32";
-	case THRIFT_I64: return "THRIFT_I64";
-	case THRIFT_DOUBLE: return "THRIFT_DOUBLE";
-	case THRIFT_BINARY: return "THRIFT_BINARY";
-	case THRIFT_LIST: return "THRIFT_LIST";
-	case THRIFT_SET: return "THRIFT_SET";
-	case THRIFT_MAP: return "THRIFT_MAP";
-	case THRIFT_STRUCT: return "THRIFT_STRUCT";
+	case THRIFT_STOP: return "STOP";
+	case THRIFT_BOOLEAN_TRUE: return "BOOLEAN_TRUE";
+	case THRIFT_BOOLEAN_FALSE: return "BOOLEAN_FALSE";
+	case THRIFT_BYTE: return "BYTE";
+	case THRIFT_I16: return "I16";
+	case THRIFT_I32: return "I32";
+	case THRIFT_I64: return "I64";
+	case THRIFT_DOUBLE: return "DOUBLE";
+	case THRIFT_BINARY: return "BINARY";
+	case THRIFT_LIST: return "LIST";
+	case THRIFT_SET: return "SET";
+	case THRIFT_MAP: return "MAP";
+	case THRIFT_STRUCT: return "STRUCT";
 	default: return "";
 	}
 }
@@ -93,7 +93,7 @@ void thrift_get_field_str(int32_t type, union thrift_value value, char * buf)
 	case THRIFT_LIST: snprintf(buf, n, "%i of %s", value.list_size, thrift_get_type_string(value.list_type)); break;
 	case THRIFT_SET: snprintf(buf, n, ""); break;
 	case THRIFT_MAP: snprintf(buf, n, ""); break;
-	case THRIFT_STRUCT: snprintf(buf, n, "..."); break;
+	case THRIFT_STRUCT: snprintf(buf, n, ""); break;
 	default: snprintf(buf, n, "?"); break;
 	}
 }
@@ -128,7 +128,11 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			ctx->data_current++;
 			modifier = (byte & 0xF0) >> 4;
 			type = byte & 0x0F;
-			if(type == THRIFT_STOP){break;}
+			if(type == THRIFT_STOP)
+			{
+				ctx->push(ctx, 0, type, value);
+				break;
+			}
 			if(ctx->data_current >= ctx->data_end){goto no_more_data;}
 			if (modifier == 0)
 			{

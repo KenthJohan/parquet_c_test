@@ -31,19 +31,15 @@ char const * parquet_get_type_string(uint32_t t)
 	}
 }
 
+static int indent = 0;
 void parquet_print_field(int32_t id, int32_t type, union thrift_value value)
 {
 	char buf[100] = {0};
 	thrift_get_field_str(type, value, buf);
-    char const * idstr =  parquet_get_id_string(id);
-	if(idstr)
-	{
-		printf("%15s = %20s : %s\n", idstr, buf, thrift_get_type_string(type));
-	}
-	else
-	{
-		printf("%15i = %20s : %s\n", id, buf, thrift_get_type_string(type));
-	}
+	for(int i = 0; i < indent; ++i){printf("|");}
+	printf("%02i = %-20s : %s\n", id, buf, thrift_get_type_string(type));
+	indent += (type == THRIFT_STRUCT);
+	indent -= (type == THRIFT_STOP);
 }
 
 

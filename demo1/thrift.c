@@ -1,5 +1,6 @@
 #include "thrift.h"
 #include <stdint.h>
+#include <ctype.h>
 #include "flecs.h"
 
 // https://github.com/apache/thrift/blob/master/lib/cpp/src/thrift/protocol/TCompactProtocol.tcc
@@ -150,11 +151,19 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		value.string_size = thrift_read_varint_i64(ctx);
 		value.string_data = NULL;
 		if(value.string_size < 0){printf("error1!\n");goto error;}
-		if(value.string_size > 10000){printf("error3!\n");goto error;}
 		if(value.string_size > 0)
 		{
-			value.string_data = ecs_os_malloc(value.string_size);
+			value.string_size = value.string_size < 100 ? value.string_size : 100; // temprary safeguard
+			value.string_data = ecs_os_malloc(value.string_size+1);
 			memcpy(value.string_data, ctx->data_current, value.string_size);
+			// Temorary start
+			value.string_data[value.string_size] = '\0';
+			for(int i = 0; i < value.string_size; ++i)
+			{
+				value.string_data[i] = isalnum(value.string_data[i]) ? value.string_data[i] : '0';
+				value.string_data[i] = isalnum(value.string_data[i]) ? value.string_data[i] : '0';
+			}
+			// Temorary end
 			ctx->data_current += value.string_size;
 		}
 		ctx->cb_field(ctx, id, type, value);

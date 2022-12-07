@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdio.h>
+#include "flecs.h"
 
 #define THRIFT_STOP 0x00
 #define THRIFT_BOOLEAN_TRUE 0x01
@@ -32,9 +33,12 @@ union thrift_value
 	};
 };
 
-
+#define THRIFT_STACK_MAX_SIZE 100
 struct thrift_context
 {
+	ecs_world_t * world;
+	ecs_entity_t scope[THRIFT_STACK_MAX_SIZE];
+	int sp;
 	uint8_t * data_start;
 	uint8_t * data_end;
 	uint8_t * data_current;

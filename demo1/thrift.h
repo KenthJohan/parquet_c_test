@@ -17,6 +17,8 @@
 #define THRIFT_MAP 0x0B
 #define THRIFT_STRUCT 0x0C
 
+
+
 union thrift_value
 {
 	uint64_t value_u64;
@@ -51,3 +53,4 @@ struct thrift_context
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type);
 void thrift_get_field_str(int32_t type, union thrift_value value, char * buf);
 char const * thrift_get_type_string(uint32_t t);
+

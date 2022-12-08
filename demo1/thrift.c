@@ -5,10 +5,64 @@
 
 // https://github.com/apache/thrift/blob/master/lib/cpp/src/thrift/protocol/TCompactProtocol.tcc
 
+char const * thrift_get_type_string(uint32_t t)
+{
+	switch(t)
+	{
+	case THRIFT_STOP: return "STOP";
+	case THRIFT_BOOLEAN_TRUE: return "BOOLEAN_TRUE";
+	case THRIFT_BOOLEAN_FALSE: return "BOOLEAN_FALSE";
+	case THRIFT_BYTE: return "BYTE";
+	case THRIFT_I16: return "I16";
+	case THRIFT_I32: return "I32";
+	case THRIFT_I64: return "I64";
+	case THRIFT_DOUBLE: return "DOUBLE";
+	case THRIFT_BINARY: return "BINARY";
+	case THRIFT_LIST: return "LIST";
+	case THRIFT_SET: return "SET";
+	case THRIFT_MAP: return "MAP";
+	case THRIFT_STRUCT: return "STRUCT";
+	default: return "";
+	}
+}
+
+
+void thrift_get_field_str(int32_t type, union thrift_value value, char * buf)
+{
+	int n = 20;
+	switch(type)
+	{
+	case THRIFT_STOP: break;
+	case THRIFT_BOOLEAN_TRUE: snprintf(buf, n, "true"); break;
+	case THRIFT_BOOLEAN_FALSE: snprintf(buf, n, "false"); break;
+	case THRIFT_BYTE: snprintf(buf, n, "%02X", value.value_u64); break;
+	case THRIFT_I16: snprintf(buf, n, "%jd", value.value_i64); break;
+	case THRIFT_I32: snprintf(buf, n, "%jd", value.value_i64); break;
+	case THRIFT_I64: snprintf(buf, n, "%jd", value.value_i64); break;
+	case THRIFT_DOUBLE: snprintf(buf, n, "%f", value.value_i64); break;
+	case THRIFT_BINARY: snprintf(buf, n, "%.*s", value.string_size, value.string_data); break;
+	case THRIFT_LIST: snprintf(buf, n, "%i of %s", value.list_size, thrift_get_type_string(value.list_type)); break;
+	case THRIFT_SET: snprintf(buf, n, ""); break;
+	case THRIFT_MAP: snprintf(buf, n, ""); break;
+	case THRIFT_STRUCT: snprintf(buf, n, ""); break;
+	default: snprintf(buf, n, "?"); break;
+	}
+}
+
+
+uint8_t thrift_read_u8(struct thrift_context * ctx)
+{
+	uint8_t b = ctx->data_current[0];
+	ctx->data_current++;
+	return b;
+}
+
+
 int64_t thrift_zigzag_to_i32(uint64_t n)
 {
 	return (int) (n >> 1) ^ -(int) (n & 1);
 }
+
 
 int64_t thrift_read_varint_i64(struct thrift_context * ctx)
 {
@@ -18,8 +72,7 @@ int64_t thrift_read_varint_i64(struct thrift_context * ctx)
 	int shift = 0;
 	while (1)
 	{
-		uint8_t b = ctx->data_current[0];
-		ctx->data_current++;
+		uint8_t b = thrift_read_u8(ctx);
 		rsize ++;
 		if (shift <= 25)
 		{
@@ -46,6 +99,7 @@ int64_t thrift_read_varint_i64(struct thrift_context * ctx)
 	return (hi << 32) | (lo << 0);
 }
 
+
 int64_t thrift_read_zigzag_i64(struct thrift_context * ctx)
 {
 	int64_t value = thrift_read_varint_i64(ctx);
@@ -53,61 +107,12 @@ int64_t thrift_read_zigzag_i64(struct thrift_context * ctx)
 }
 
 
-
-
-
-char const * thrift_get_type_string(uint32_t t)
-{
-	switch(t)
-	{
-	case THRIFT_STOP: return "STOP";
-	case THRIFT_BOOLEAN_TRUE: return "BOOLEAN_TRUE";
-	case THRIFT_BOOLEAN_FALSE: return "BOOLEAN_FALSE";
-	case THRIFT_BYTE: return "BYTE";
-	case THRIFT_I16: return "I16";
-	case THRIFT_I32: return "I32";
-	case THRIFT_I64: return "I64";
-	case THRIFT_DOUBLE: return "DOUBLE";
-	case THRIFT_BINARY: return "BINARY";
-	case THRIFT_LIST: return "LIST";
-	case THRIFT_SET: return "SET";
-	case THRIFT_MAP: return "MAP";
-	case THRIFT_STRUCT: return "STRUCT";
-	default: return "";
-	}
-}
-
-void thrift_get_field_str(int32_t type, union thrift_value value, char * buf)
-{
-	int n = 20;
-	switch(type)
-	{
-	case THRIFT_STOP: break;
-	case THRIFT_BOOLEAN_TRUE: snprintf(buf, n, "true"); break;
-	case THRIFT_BOOLEAN_FALSE: snprintf(buf, n, "false"); break;
-	case THRIFT_BYTE: snprintf(buf, n, "%02X", value.value_u64); break;
-	case THRIFT_I16: snprintf(buf, n, "%jd", value.value_i64); break;
-	case THRIFT_I32: snprintf(buf, n, "%jd", value.value_i64); break;
-	case THRIFT_I64: snprintf(buf, n, "%jd", value.value_i64); break;
-	case THRIFT_DOUBLE: snprintf(buf, n, "%f", value.value_i64); break;
-	case THRIFT_BINARY: snprintf(buf, n, "%.*s", value.string_size, value.string_data); break;
-	case THRIFT_LIST: snprintf(buf, n, "%i of %s", value.list_size, thrift_get_type_string(value.list_type)); break;
-	case THRIFT_SET: snprintf(buf, n, ""); break;
-	case THRIFT_MAP: snprintf(buf, n, ""); break;
-	case THRIFT_STRUCT: snprintf(buf, n, ""); break;
-	default: snprintf(buf, n, "?"); break;
-	}
-}
-
 void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
 {
 	char buf[100] = {0};
 	thrift_get_field_str(type, value, buf);
 	printf("%i = %s : %s\n", id, buf, thrift_get_type_string(type));
 }
-
-
-
 
 
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type)
@@ -125,8 +130,7 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		{
 			uint8_t modifier;
 			int32_t id;
-			byte = ctx->data_current[0];
-			ctx->data_current++;
+			byte = thrift_read_u8(ctx);
 			modifier = (byte & 0xF0) >> 4;
 			type = byte & 0x0F;
 			if(type == THRIFT_STOP)
@@ -185,10 +189,9 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		ctx->cb_field(ctx, id, type, value);
 		break;
 	case THRIFT_LIST:
-		byte = ctx->data_current[0];
+		byte = thrift_read_u8(ctx);
 		value.list_type = byte & 0x0F;
 		value.list_size = (byte >> 4) & 0x0F;
-		ctx->data_current++;
 		if(ctx->data_current >= ctx->data_end){goto no_more_data;}
 		if(value.list_size == 0xF)
 		{

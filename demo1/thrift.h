@@ -38,13 +38,12 @@ union thrift_value
 #define THRIFT_STACK_MAX_SIZE 100
 struct thrift_context
 {
-	ecs_world_t * world;
-	ecs_entity_t scope[THRIFT_STACK_MAX_SIZE];
-	int sp;
 	uint8_t * data_start;
 	uint8_t * data_end;
 	uint8_t * data_current;
 	int32_t last_field_id;
+	int32_t stack_id[THRIFT_STACK_MAX_SIZE];
+	int32_t sp;
     void (*cb_field)(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value);
 };
 

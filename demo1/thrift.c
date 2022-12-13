@@ -120,21 +120,26 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 	if(ctx->data_current >= ctx->data_end){goto no_more_data;}
     union thrift_value value = {0};
 	uint8_t byte;
+	uint8_t modifier;
 	switch (type)
     {
-	case THRIFT_STOP:break;
+	case THRIFT_STOP:
+		break;
 	case THRIFT_STRUCT:
+		ctx->stack_id[ctx->sp] = ctx->last_field_id;
+		ctx->sp++;
 		ctx->last_field_id = 0;
-		ctx->cb_field(ctx, 0, type, value);
+		ctx->cb_field(ctx, id, type, value);
         while(1)
 		{
-			uint8_t modifier;
 			int32_t id;
 			byte = thrift_read_u8(ctx);
 			modifier = (byte & 0xF0) >> 4;
 			type = byte & 0x0F;
 			if(type == THRIFT_STOP)
 			{
+				ctx->sp--;
+				ctx->last_field_id = ctx->stack_id[ctx->sp];
 				ctx->cb_field(ctx, 0, type, value);
 				break;
 			}

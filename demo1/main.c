@@ -11,10 +11,10 @@ void print_field(int32_t id, int32_t type, union thrift_value value)
 	static int indent = -1;
 	char buf[100] = {0};
 	thrift_get_field_str(type, value, buf);
-	for(int i = 0; i < indent; ++i){printf(" ");}
+	for(int i = 0; i < indent; ++i){printf("    ");}
 	switch (type)
 	{
-	case THRIFT_STRUCT:printf("{\n");break;
+	case THRIFT_STRUCT:printf("%i = {\n", id);break;
 	case THRIFT_STOP:printf("}\n");break;
 	}
 	indent += (type == THRIFT_STRUCT);
@@ -33,6 +33,7 @@ void print_field(int32_t id, int32_t type, union thrift_value value)
 
 void cb_field(struct thrift_context * ctx, int32_t id, int32_t type, union thrift_value value)
 {
+	/*
 	char buf[100] = {0};
 	ecs_entity_t e = 0;
 	switch (type)
@@ -60,6 +61,7 @@ void cb_field(struct thrift_context * ctx, int32_t id, int32_t type, union thrif
 		ecs_doc_set_name(ctx->world, e, buf);
 		break;
 	}
+	*/
 	
     print_field(id, type, value);
 	//printf("%p %p\n", ctx->data_current, ctx->data_end);
@@ -84,9 +86,6 @@ int main (int argc, char * argv [])
 	ecs_world_t *world = ecs_init_w_args(argc, argv);
 	ECS_IMPORT(world, FlecsUnits);
 	struct thrift_context ctx = {0};
-	ctx.scope[0] = ecs_new_entity(world, "Sun");
-	ecs_set_scope(world, ctx.scope[0]);
-	ctx.world = world;
     read_a_parquet_file(ctx, "../demo1/userdata1.parquet");
 	printf("Run ECS\n");
     return ecs_app_run(world, &(ecs_app_desc_t){

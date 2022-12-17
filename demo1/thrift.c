@@ -115,6 +115,19 @@ void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
 }
 
 
+void string_friendly(char s[], int n)
+{
+	// Temorary start
+	for(int i = 0; i < n; ++i)
+	{
+		if ((s[i] >= 32) && (s[i] <= 126)) {continue;}
+		s[i] = '?';
+	}
+	// Temorary end
+}
+
+
+
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type)
 {
 	if(ctx->data_current >= ctx->data_end){goto no_more_data;}
@@ -126,10 +139,10 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 	case THRIFT_STOP:
 		break;
 	case THRIFT_STRUCT:
+		ctx->cb_field(ctx, id, type, value);
 		ctx->stack_id[ctx->sp] = ctx->last_field_id;
 		ctx->sp++;
 		ctx->last_field_id = 0;
-		ctx->cb_field(ctx, id, type, value);
         while(1)
 		{
 			int32_t id;
@@ -165,14 +178,8 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			value.string_size = value.string_size < 100 ? value.string_size : 100; // temprary safeguard
 			value.string_data = ecs_os_malloc(value.string_size+1);
 			memcpy(value.string_data, ctx->data_current, value.string_size);
-			// Temorary start
 			value.string_data[value.string_size] = '\0';
-			for(int i = 0; i < value.string_size; ++i)
-			{
-				value.string_data[i] = isalnum(value.string_data[i]) ? value.string_data[i] : '0';
-				value.string_data[i] = isalnum(value.string_data[i]) ? value.string_data[i] : '0';
-			}
-			// Temorary end
+			string_friendly(value.string_data, value.string_size);
 			ctx->data_current += value.string_size;
 		}
 		ctx->cb_field(ctx, id, type, value);
@@ -219,6 +226,4 @@ no_more_data:
 error:
 	return;
 }
-
-
 

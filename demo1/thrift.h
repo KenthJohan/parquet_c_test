@@ -50,6 +50,6 @@ struct thrift_context
 
 
 void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type);
-void thrift_get_field_str(int32_t type, union thrift_value value, char * buf);
+void thrift_get_field_str(int32_t type, union thrift_value value, char * buf, int n);
 char const * thrift_get_type_string(uint32_t t);
 

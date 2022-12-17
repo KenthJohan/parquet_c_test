@@ -27,9 +27,20 @@ char const * thrift_get_type_string(uint32_t t)
 }
 
 
-void thrift_get_field_str(int32_t type, union thrift_value value, char * buf)
+void string_friendly(char s[], int n)
 {
-	int n = 20;
+	// Temorary start
+	for(int i = 0; i < n; ++i)
+	{
+		if (s[i] == '\0') {break;}
+		if ((s[i] >= 32) && (s[i] <= 126)) {continue;}
+		s[i] = '?';
+	}
+	// Temorary end
+}
+
+void thrift_get_field_str(int32_t type, union thrift_value value, char * buf, int n)
+{
 	switch(type)
 	{
 	case THRIFT_STOP: break;
@@ -40,7 +51,10 @@ void thrift_get_field_str(int32_t type, union thrift_value value, char * buf)
 	case THRIFT_I32: snprintf(buf, n, "%jd", value.value_i64); break;
 	case THRIFT_I64: snprintf(buf, n, "%jd", value.value_i64); break;
 	case THRIFT_DOUBLE: snprintf(buf, n, "%f", value.value_i64); break;
-	case THRIFT_BINARY: snprintf(buf, n, "%.*s", value.string_size, value.string_data); break;
+	case THRIFT_BINARY:
+		//string_friendly(value.string_data, value.string_size);
+		snprintf(buf, n, "%.*s", value.string_size, value.string_data);
+		break;
 	case THRIFT_LIST: snprintf(buf, n, "%i of %s", value.list_size, thrift_get_type_string(value.list_type)); break;
 	case THRIFT_SET: snprintf(buf, n, ""); break;
 	case THRIFT_MAP: snprintf(buf, n, ""); break;
@@ -107,24 +121,8 @@ int64_t thrift_read_zigzag_i64(struct thrift_context * ctx)
 }
 
 
-void thrift_print_field(int32_t id, int32_t type, union thrift_value value)
-{
-	char buf[100] = {0};
-	thrift_get_field_str(type, value, buf);
-	printf("%i = %s : %s\n", id, buf, thrift_get_type_string(type));
-}
 
 
-void string_friendly(char s[], int n)
-{
-	// Temorary start
-	for(int i = 0; i < n; ++i)
-	{
-		if ((s[i] >= 32) && (s[i] <= 126)) {continue;}
-		s[i] = '?';
-	}
-	// Temorary end
-}
 
 
 
@@ -145,7 +143,6 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 		ctx->last_field_id = 0;
         while(1)
 		{
-			int32_t id;
 			byte = thrift_read_u8(ctx);
 			modifier = (byte & 0xF0) >> 4;
 			type = byte & 0x0F;
@@ -159,14 +156,13 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			if(ctx->data_current >= ctx->data_end){goto no_more_data;}
 			if (modifier == 0)
 			{
-				id = thrift_read_varint_i64(ctx);
+				ctx->last_field_id = thrift_read_varint_i64(ctx);
 			}
 			else
 			{
-				id = ctx->last_field_id + modifier;
+				ctx->last_field_id = ctx->last_field_id + modifier;
 			}
-			ctx->last_field_id = id;
-			thrift_recursive_read(ctx, id, type);
+			thrift_recursive_read(ctx, ctx->last_field_id, type);
 		}
 		break;
 	case THRIFT_BINARY:
@@ -179,7 +175,6 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			value.string_data = ecs_os_malloc(value.string_size+1);
 			memcpy(value.string_data, ctx->data_current, value.string_size);
 			value.string_data[value.string_size] = '\0';
-			string_friendly(value.string_data, value.string_size);
 			ctx->data_current += value.string_size;
 		}
 		ctx->cb_field(ctx, id, type, value);

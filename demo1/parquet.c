@@ -32,6 +32,35 @@ char const * parquet_get_type_string(uint32_t t)
 }
 
 
+
+struct ByteArray
+{
+    uint32_t len;
+    char* ptr;
+};
+
+int parquet_read_bytearray(const uint8_t* data, int64_t data_size, int num_values, int type_length, struct ByteArray* out)
+{
+    int bytes_decoded = 0;
+    int increment;
+    for (int i = 0; i < num_values; ++i)
+    {
+        uint32_t len = (uint32_t)(*data);
+        out[i].len = len;
+        increment = sizeof(uint32_t) + len;
+        if (data_size < increment) {return EOF;}
+        out[i].ptr = data + sizeof(uint32_t);
+        data += increment;
+        data_size -= increment;
+        bytes_decoded += increment;
+    }
+    return bytes_decoded;
+}
+
+
+
+
+
 void parquet_read_footer(struct thrift_context * ctx, FILE * file)
 {
     char par1[4] = {0};
@@ -48,5 +77,22 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
     ctx->data_current = ctx->data_start;
     ctx->data_end = ctx->data_start + l;
     fread(ctx->data_start, l, 1, file);
+
+
+
+    // column first_name
+    {
+        int n = 1000;
+        fseek(file, 17317, SEEK_SET);
+        struct ByteArray a[100] = {0};
+        const uint8_t* data = ecs_os_malloc(n);
+        fread(data, n, 1, file);
+        parquet_read_bytearray(data, n, 100, 1, a);
+        printf("parquet_read_bytearray\n");
+    }
+
 }
+
+
+
 

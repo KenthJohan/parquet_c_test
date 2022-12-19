@@ -82,12 +82,18 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
 
     // column first_name
     {
+        int data_size = 1000000;
         int n = 1000;
         fseek(file, 17317, SEEK_SET);
-        struct ByteArray a[100] = {0};
-        const uint8_t* data = ecs_os_malloc(n);
+        struct ByteArray * a = ecs_os_malloc_n(struct ByteArray, n);
+        const uint8_t* data = ecs_os_malloc_n(uint8_t, data_size);
         fread(data, n, 1, file);
-        parquet_read_bytearray(data, n, 100, 1, a);
+        parquet_read_bytearray(data, data_size, n, 1, a);
+        printf("parquet_read_bytearray\n");
+        for(int i = 0; i < n; ++i)
+        {
+		    printf("%4i %4i %08i: %.*s\n", i, a[i].len, (intptr_t)a[i].ptr - (intptr_t)data, a[i].len, a[i].ptr);
+        }
         printf("parquet_read_bytearray\n");
     }
 

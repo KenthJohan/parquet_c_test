@@ -205,10 +205,12 @@ void thrift_recursive_read(struct thrift_context * ctx, int32_t id, int32_t type
 			value.list_size = thrift_read_varint_i64(ctx);
 		}
 		ctx->cb_field(ctx, id, type, value);
+		ctx->sp++;
 		for(int i = 0; i < value.list_size; ++i)
 		{
-			thrift_recursive_read(ctx, id, value.list_type);
+			thrift_recursive_read(ctx, i, value.list_type);
 		}
+		ctx->sp--;
 		break;
 	default:
 		printf("Warning no type found %i!\n", type);

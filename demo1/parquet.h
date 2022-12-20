@@ -116,7 +116,73 @@
 
 
 
-void parquet_read_footer(struct thrift_context * ctx, FILE * file);
+// https://parquet.apache.org/docs/file-format/metadata/
+
+typedef struct
+{
+	int32_t version; // id=1,
+	ecs_vector_t *schema; // id=2, schema<parquet_schema_element_t>
+	int64_t num_rows; // id=3
+	ecs_vector_t *row_groups; // id=4, row_groups<parquet_rowgroup_t>
+	ecs_vector_t *key_value_metadata; // id=5, key_value_metadata<parquet_rowgroup_t>
+} parquet_filemetadata_t;
+
+typedef struct
+{
+	int type;
+	int32_t type_length;
+	int32_t repetition_type;
+	ecs_string_t name;
+	int32_t num_children;
+	int converted_type;
+} parquet_schema_element_t;
+
+typedef struct
+{
+	ecs_vector_t *columns;
+	int64_t total_byte_size;
+	int64_t num_rows;
+} parquet_rowgroup_t;
+
+typedef struct
+{
+	ecs_string_t file_path;
+	int64_t file_offset;
+} parquet_column_chunk_t;
+
+typedef struct
+{
+	int type;
+	ecs_vector_t *encodings; // encodings<int>
+	ecs_vector_t *path_in_schema; // path_in_schema<ecs_string_t>
+	int codec;
+	int64_t num_values;
+	int64_t total_uncompressed_size;
+	int64_t total_compressed_size;
+	ecs_vector_t *key_value_metadata; // key_value_metadata<parquet_rowgroup_t>
+} parquet_column_meta_data_t;
+
+
+
+
+typedef struct
+{
+	struct thrift_context footer;
+	parquet_filemetadata_t meta;
+} parquet_reader_t;
+
+
+
+
+
+
+
+
+
+
+
+
+void parquet_read(parquet_reader_t *reader, char const * filename);
 void parquet_testcase1();
 
 

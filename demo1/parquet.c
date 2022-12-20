@@ -58,11 +58,70 @@ int parquet_read_bytearray(const uint8_t* data, int64_t data_size, int num_value
 }
 
 
-
-
-
-void parquet_read_footer(struct thrift_context * ctx, FILE * file)
+void parquet_assigner_filemetadata(parquet_filemetadata_t *data, int32_t id, int32_t type, union thrift_value value)
 {
+    switch (id)
+    {
+    case 1:data->version = value.value_i64; break;
+    case 2:data->schema = ecs_vector_new(parquet_schema_element_t, 0); break;
+    case 3:data->num_rows = value.value_i64; break;
+    default:break;
+    }
+};
+
+
+
+void print_field1(int32_t id, int32_t type, union thrift_value value, int indent)
+{
+	char buf[100] = {0};
+	thrift_get_field_str(type, value, buf, 100);
+	for(int i = 0; i < indent; ++i){printf("    ");}
+	switch (type)
+	{
+	case THRIFT_STRUCT:
+		printf("%02i =\n", id);
+		for(int i = 0; i < indent; ++i){printf("    ");}
+		printf("{\n");
+		break;
+	case THRIFT_STOP:printf("}\n");break;
+	}
+	switch (type)
+	{
+	case THRIFT_STRUCT:break;
+	case THRIFT_STOP:break;
+	default:
+		printf("%02i = %-20s : %s\n", id, buf, thrift_get_type_string(type));
+		break;
+	}
+}
+
+
+void parquet_footer_cb(struct thrift_context *ctx, int32_t id, int32_t type, union thrift_value value)
+{
+	print_field1(id, type, value, ctx->sp);
+    parquet_reader_t *reader = (parquet_reader_t*)ctx;
+    if(ctx->sp == 1 && ctx->stack_id[0] == 0)
+    {
+        parquet_assigner_filemetadata(&reader->meta, id, type, value);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+void parquet_read(parquet_reader_t * reader, char const * filename)
+{
+	FILE * file = NULL;
+	ecs_os_fopen(&file, filename, "rb");
     char par1[4] = {0};
     char par2[4] = {0};
     int32_t l = 0;
@@ -73,14 +132,16 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
     fseek(file, 0, SEEK_SET);
     fread(par2, sizeof(par2), 1, file);
     fseek(file, -8-l, SEEK_END);
-    ctx->data_start = ecs_os_malloc(l);
-    ctx->data_current = ctx->data_start;
-    ctx->data_end = ctx->data_start + l;
-    fread(ctx->data_start, l, 1, file);
+    reader->footer.data_start = ecs_os_malloc(l);
+    reader->footer.data_current = reader->footer.data_start;
+    reader->footer.data_end = reader->footer.data_start + l;
+    reader->footer.cb_field = parquet_footer_cb;
+    fread(reader->footer.data_start, l, 1, file); 
 
-
+    thrift_recursive_read(&reader->footer, 0, THRIFT_STRUCT);
 
     // column first_name
+    /*
     {
         int data_size = 1000000;
         int n = 1000;
@@ -96,7 +157,9 @@ void parquet_read_footer(struct thrift_context * ctx, FILE * file)
         }
         printf("parquet_read_bytearray\n");
     }
-
+    */
+	if(file) {fclose(file);}
+	if(reader->footer.data_start) {ecs_os_free(reader->footer.data_start);}
 }
 
 
